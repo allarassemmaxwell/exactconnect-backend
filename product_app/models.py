@@ -10,10 +10,17 @@ from django.core import validators
 from uuid import uuid4
 import os
 from datetime import datetime
+import string  
+import secrets 
 
 
 
-
+def random_string(num):   
+    """
+    Generates a random string of length 'num' with letters and digits.
+    """
+    res = ''.join(secrets.choice(string.ascii_letters + string.digits) for x in range(num))  
+    return str(res)
 def path_and_rename(instance, filename):
     """
     Generates a file path based on the current year/month and model pk or UUID for filename.
@@ -106,8 +113,7 @@ class Order(models.Model):
     Stores the relationship between a user and a product order.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    reference = models.CharField(max_length=255, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -116,11 +122,45 @@ class Order(models.Model):
         """
         Returns a readable string representing the order: 'username - product title'.
         """
-        return f"{self.user.username} - {self.product.title}"
+        return self.reference
+    
+    def save(self, *args, **kwargs):
+        """
+        Override the save method to generate the reference before saving the property.
+        """
+        if not self.reference:
+            self.reference = random_string(10)
+        super(Order, self).save(*args, **kwargs)
 
 
     def total_price(self):
         """
         Calculates the total price for this order.
         """
+        total = sum(item.total_price() for item in self.orderitems.all())
+        return total
+    
+
+class OrderItem(models.Model):
+    """
+    Represents an individual item in an order, including the product and its quantity.
+    """
+    order = models.ForeignKey(Order, related_name="orderitems", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated_at = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+    def __str__(self):
+        """
+        Returns a readable string for the order item: 'product title - quantity'.
+        """
+        return f"{self.product.title} - {self.quantity}"
+
+    def total_price(self):
+        """
+        Calculates the total price for this order item (product price * quantity).
+        """
         return self.quantity * self.product.price
+

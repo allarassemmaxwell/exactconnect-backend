@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from django.utils.translation import gettext_lazy as _
 
-from .models import Product, Order, User
+from .models import Product, Order, User, OrderItem
 
 
 # USER ADMIN 
@@ -66,7 +66,7 @@ class OrderAdmin(admin.ModelAdmin):
     date_hierarchy      = 'created_at'
 
     # Specifies the fields to display in the list view
-    list_display        = ['user', 'product', 'quantity', 'is_active', 'created_at']
+    list_display        = ['user', 'reference', 'is_active', 'created_at']
     list_display_links  = ['user',]
     list_filter         = ['user', 'is_active', 'created_at']
     search_fields       = ['user__username', 'is_active']
@@ -76,3 +76,25 @@ class OrderAdmin(admin.ModelAdmin):
         # Links this admin class to the SMS model
         model = Order
 admin.site.register(Order, OrderAdmin)
+
+
+class OrderItemAdmin(admin.ModelAdmin):
+    """
+    Admin interface for managing Order Item records.
+    Provides display, filtering, and search functionality in the Django admin.
+    """
+
+    # Display a hierarchical navigation bar based on the 'created_at' date
+    date_hierarchy      = 'created_at'
+
+    # Specifies the fields to display in the list view
+    list_display        = ['order', 'product', 'is_active', 'created_at']
+    list_display_links  = ['order',]
+    list_filter         = ['order', 'is_active', 'created_at']
+    search_fields       = ['order', 'is_active']
+    list_per_page       = 50
+
+    class Meta:
+        # Links this admin class to the SMS model
+        model = OrderItem
+admin.site.register(OrderItem, OrderItemAdmin)

@@ -80,53 +80,29 @@ class ProductListView(generics.ListAPIView):
         return queryset
 
 
-class OrderCreateView(generics.CreateAPIView):
+
+class OrderCreateView(APIView):
     """
-    API view to allow authenticated users to place an order.
-
-    Automatically assigns the currently logged-in user to the order.
+    View to create an order.
     """
-    serializer_class = CreateOrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class UserOrdersView(generics.ListAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = OrderCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)  # Associate the logged-in user with the order
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from rest_framework.generics import ListAPIView
+class UserOrdersView(ListAPIView):
     """
-    API view to list all orders placed by the authenticated user.
-
-    Only returns orders that belong to the currently logged-in user.
+    View to retrieve a list of orders for the authenticated user.
     """
-    serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    serializer_class = UserOrderSerializer
 
     def get_queryset(self):
+        """
+        Return orders for the logged-in user.
+        """
         return Order.objects.filter(user=self.request.user)
-
-
-class DownloadOrdersCSV(views.APIView):
-    """
-    API view to allow the authenticated user to download their orders as a CSV file.
-
-    The CSV includes product name, quantity, price, and total price for each order.
-    """
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        orders = Order.objects.filter(user=request.user)
-        response_ = HttpResponse(content_type='text/csv')
-        response_['Content-Disposition'] = 'attachment; filename="orders.csv"'
-
-        writer = csv.writer(response_)
-        writer.writerow(['Product', 'Quantity', 'Price', 'Total'])
-
-        for order in orders:
-            writer.writerow([
-                order.product.title,
-                order.quantity,
-                order.product.price,
-                order.total_price()
-            ])
-        return response_
