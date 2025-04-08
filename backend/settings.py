@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -123,21 +124,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# CORS_ORIGIN_WHITELIST defines the frontend origins that are allowed to make cross-origin requests to the backend.
-# This ensures that only specified client applications (e.g., React apps) can interact with the API.
-CORS_ORIGIN_WHITELIST = (
-    'https://mezizbet.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173'
-)
 
-# REST_FRAMEWORK settings for Django REST Framework.
-# Configures JWT authentication as the default method for securing API endpoints.
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -155,6 +142,26 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "media_cdn")
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # This is required for email-based authentication
 )
+
+
+CORS_ORIGIN_WHITELIST = (
+    'https://mezizbet.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+)
+
+# REST_FRAMEWORK settings for Django REST Framework.
+# Configures JWT authentication as the default method for securing API endpoints.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # Access token expires in 5 minutes
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    # Refresh token expires in 1 day
+    "ROTATE_REFRESH_TOKENS": False,
+}
 
 
 

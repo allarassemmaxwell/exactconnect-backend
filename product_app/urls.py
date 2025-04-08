@@ -10,5 +10,4 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product_list'),
     path('orders/', OrderCreateView.as_view(), name='create_order'),
     path('my-orders/', UserOrdersView.as_view(), name='user_orders'),
-    path('download-orders/', DownloadOrdersCSV.as_view(), name='download_orders'),
 ]
