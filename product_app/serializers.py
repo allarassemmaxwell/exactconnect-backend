@@ -16,8 +16,6 @@ class UserRegisterationSerializer(serializers.ModelSerializer):
 		model  = User
 		fields = ("first_name", "last_name", "email", "password")
 		extra_kwargs = {"password": {"write_only": True}}
-	def validate(self, attrs):
-		return attrs
 	
 	def create(self, validated_data):
 		return User.objects.create_user(**validated_data)
@@ -75,7 +73,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
     """
     Serializer for the OrderItem model.
     """
-
     product_title = serializers.CharField(source='product.title', read_only=True)
 
     class Meta:
@@ -95,7 +92,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating an order, including order items.
     """
-
     orderitems = OrderItemSerializer(many=True)
 
     class Meta:

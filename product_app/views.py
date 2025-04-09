@@ -1,5 +1,4 @@
-from rest_framework import generics, permissions, views
-from django.http import HttpResponse
+from rest_framework import generics, permissions
 from .models import Product, Order
 from .serializers import *
 import csv
@@ -8,13 +7,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import  Response
-from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
-
-
+from rest_framework.generics import GenericAPIView, ListAPIView
 from django.contrib.auth import get_user_model
 User = get_user_model()
-
-
 
 
 
@@ -57,7 +52,6 @@ class LoginView(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
         }
-
         return Response(response_data, status=status.HTTP_200_OK)
 
 
@@ -70,7 +64,7 @@ class ProductListView(generics.ListAPIView):
     - Supports optional filtering by product title using query parameter (?title=).
     """
     serializer_class = ProductSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Product.objects.all()
@@ -80,26 +74,28 @@ class ProductListView(generics.ListAPIView):
         return queryset
 
 
-
 class OrderCreateView(APIView):
     """
     View to create an order.
     """
-
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request, *args, **kwargs):
         serializer = OrderCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)  # Associate the logged-in user with the order
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-from rest_framework.generics import ListAPIView
+
 class UserOrdersView(ListAPIView):
     """
     View to retrieve a list of orders for the authenticated user.
     """
 
     serializer_class = UserOrderSerializer
+    permission_classes = [IsAuthenticated]
+
 
     def get_queryset(self):
         """

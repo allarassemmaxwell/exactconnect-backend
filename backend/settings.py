@@ -29,14 +29,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'product_app.User'
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -147,7 +146,8 @@ AUTHENTICATION_BACKENDS = (
 CORS_ORIGIN_WHITELIST = (
     'https://mezizbet.vercel.app',
     'http://localhost:3000',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    "https://exactconnect-frontend-51v3huqk9-allarassems-projects.vercel.app"
 )
 
 # REST_FRAMEWORK settings for Django REST Framework.
@@ -158,11 +158,9 @@ REST_FRAMEWORK = {
     )
 }
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # Access token expires in 5 minutes
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    # Refresh token expires in 1 day
-    "ROTATE_REFRESH_TOKENS": False,
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=3),  # Access token expires in 3 days
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),    # Refresh token expires in 5 day
 }
-
 
 
 # Default primary key field type
