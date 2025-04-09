@@ -3,13 +3,10 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-
 from django.utils.translation import gettext_lazy as _
-
 from .models import Product, Order, User, OrderItem
 
 
-# USER ADMIN 
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     """
@@ -31,7 +28,6 @@ class UserAdmin(DjangoUserAdmin):
     search_fields = ('email', 'first_name', 'last_name', 'is_active', 'is_staff')
     ordering = ('email',)
     readonly_fields = ('last_login',)
-
 
 
 class ProductAdmin(admin.ModelAdmin):

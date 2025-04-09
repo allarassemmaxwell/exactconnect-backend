@@ -7,34 +7,9 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.core import validators
-from uuid import uuid4
-import os
-from datetime import datetime
-import string  
-import secrets 
+from .utils import random_string
 
 
-
-def random_string(num):   
-    """
-    Generates a random string of length 'num' with letters and digits.
-    """
-    res = ''.join(secrets.choice(string.ascii_letters + string.digits) for x in range(num))  
-    return str(res)
-def path_and_rename(instance, filename):
-    """
-    Generates a file path based on the current year/month and model pk or UUID for filename.
-    """
-    upload_to = '{}/{}/'.format(datetime.now().year, datetime.now().month)
-    ext = filename.split('.')[-1]
-    if instance.pk:
-        filename = '{}.{}'.format(instance.pk, ext)
-    else:
-        filename = '{}.{}'.format(uuid4().hex, ext)
-    return os.path.join(upload_to, filename)
-
-
-# CREATE USERMANAGER 
 class UserManager(BaseUserManager):
     """
     Custom manager for user creation with roles: user, staff, superuser.
@@ -96,7 +71,6 @@ class Product(models.Model):
     """
     title = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to=path_and_rename, null=True, blank=True)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -107,6 +81,7 @@ class Product(models.Model):
         Returns a readable string representing the order: 'username - product title'.
         """
         return self.title
+
 
 class Order(models.Model):
     """
@@ -131,7 +106,6 @@ class Order(models.Model):
         if not self.reference:
             self.reference = random_string(10)
         super(Order, self).save(*args, **kwargs)
-
 
     def total_price(self):
         """
@@ -163,4 +137,3 @@ class OrderItem(models.Model):
         Calculates the total price for this order item (product price * quantity).
         """
         return self.quantity * self.product.price
-
