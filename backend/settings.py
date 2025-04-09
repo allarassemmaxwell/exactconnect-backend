@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'product_app'
@@ -144,10 +145,9 @@ AUTHENTICATION_BACKENDS = (
 
 
 CORS_ORIGIN_WHITELIST = (
-    'https://mezizbet.vercel.app',
     'http://localhost:3000',
     'http://localhost:5173',
-    "https://exactconnect-frontend-51v3huqk9-allarassems-projects.vercel.app"
+    "https://frontend-url-here.com"
 )
 
 # REST_FRAMEWORK settings for Django REST Framework.
